@@ -1,8 +1,7 @@
-
 # deployment user for elb registrations, s3 access, efs mount etc.
 resource "aws_iam_user" "deployment" {
     name = "${var.cluster_name}-deployment"
-    path = "/system/"   
+    path = "/system/"
 }
 resource "aws_iam_user_policy" "deployment" {
     name = "${aws_iam_user.deployment.name}"

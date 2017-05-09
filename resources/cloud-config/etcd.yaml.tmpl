@@ -118,21 +118,6 @@ coreos:
         EnvironmentFile=/etc/environment
         ExecStart=/opt/bin/post-provision.sh
 write_files:            
-  - path: /opt/bin/git-sync.sh
-    permissions: 0700
-    owner: root
-    content: |
-        #!/bin/bash
-        # This script sync /var/lib/apps with github repo
-        export GIT_SSH_COMMAND=${GIT_SSH_COMMAND}
-        if [[ -d /var/lib/apps/.git ]]; 
-        then 
-            cd /var/lib/apps; git pull
-        else
-            mkdir -p /var/lib
-            #git clone https://github.com/dockerage/coreos-cluster-apps /var/lib/apps
-            git clone ${APP_REPOSITORY} /var/lib/apps
-        fi
   - path: /opt/bin/s3sync.sh
     permissions: 0700
     owner: root
@@ -169,11 +154,6 @@ write_files:
             done
         fi
         exit 0
-  - path: /etc/systemd/system/docker.service.d/50-insecure-registry.conf
-    content: |
-        [Service]
-        Environment=DOCKER_OPTS='--insecure-registry=10.0.0.0/8,dockerhub.coreos-cluster.local'
-
   - path: /opt/bin/etcd-init.sh
     permissions: 0700
     owner: root

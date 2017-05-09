@@ -13,9 +13,3 @@
     $ sudo cp rootCA.pem /etc/ssl/certs/XXX-Dockerage.pem
     $ cd /etc/ssl/certs && sudo update-ca-certificates [--fresh]
 
-###To test ssl connection and the cert:
-
-    $ openssl s_client -showcerts -connect dockerhub.DOMAIN:443
-
-
-

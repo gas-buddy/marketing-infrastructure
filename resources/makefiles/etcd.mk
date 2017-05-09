@@ -9,9 +9,6 @@ etcd_only: init create_etcd_key
 	mkdir -p $(BUILD)/etcd
 	rsync -av  $(RESOURCES)/terraforms/etcd/ $(BUILD)/etcd
 	cd $(BUILD)/etcd ; ln -sf ../*.tf .
-	@if [[ "X$(APP_REPOSITORY_DEPLOYKEY)" != "X" ]] && [[ -f $(APP_REPOSITORY_DEPLOYKEY) ]]; then \
-  		 cat $(APP_REPOSITORY_DEPLOYKEY) >> $(BUILD)/cloud-config/etcd.yaml.tmpl; \
-  	fi
 	@cd $(BUILD)/etcd ; $(SCRIPTS)/tf-apply-confirm.sh
 	# Wait for vpc/subnets to be ready
 	sleep 5
@@ -42,9 +39,6 @@ init_etcd: vpc iam s3 create_etcd_key
 	mkdir -p $(BUILD)/etcd
 	rsync -av  $(RESOURCES)/terraforms/etcd/ $(BUILD)/etcd
 	cd $(BUILD)/etcd ; rm -rf $(BUILD)/etcd_vars.tf etcd_vars.tf ; ln -sf ../*.tf .
-	@if [[ "X$(APP_REPOSITORY_DEPLOYKEY)" != "X" ]] && [[ -f $(APP_REPOSITORY_DEPLOYKEY) ]]; then \
-  		 cat $(APP_REPOSITORY_DEPLOYKEY) >> $(BUILD)/cloud-config/etcd.yaml.tmpl; \
-  	fi
 
 clean_etcd:
 	rm -rf $(BUILD)/etcd $(BUILD)/etcd_vars.tf

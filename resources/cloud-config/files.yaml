@@ -73,10 +73,6 @@ write_files:
             fi
         fi
         exit 0
-  - path: /etc/systemd/system/docker.service.d/50-insecure-registry.conf
-    content: |
-        [Service]
-        Environment=DOCKER_OPTS='--insecure-registry=10.0.0.0/8,dockerhub.coreos-cluster.local'
 
   - path: /opt/bin/etcd-init.sh
     permissions: 0700

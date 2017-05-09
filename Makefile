@@ -11,9 +11,6 @@ include envs.sh
 # Default AWS profile and cluster name. Please choose cluster name carefully. It will used as prefix in many AWS resources to be created.
 AWS_PROFILE ?= NODEFAULT
 CLUSTER_NAME ?= NODEFAULT
-# Application repository. Automatically synced to /var/lib/apps every minute
-APP_REPOSITORY ?= https://github.com/dockerage/coreos-cluster-apps
-APP_REPOSITORY_DEPLOYKEY ?= ''
 
 # Domain: default domain for Route53 zone and a self-signed *.domain cert for default ELBs.
 APP_DOMAIN ?= 'example.com'
@@ -26,7 +23,7 @@ VM_TYPE ?= hvm
 # All resources used in destroy_all, in the order of dependencies.
 # It doesn't hurt if a resource in the list is not created, but if it does, add 
 # it to the list to make sure cleanup is done properly. 
-ALL_RESOURCES := vault admiral worker etcd iam s3 elb-ci elb-gitlab elb_dockerhub efs rds route53 cloudtrail vpc
+ALL_RESOURCES := worker etcd iam s3 elb-web efs rds route53 cloudtrail vpc
 
 # To prevent you from mistakenly using a wrong account (and end up destroying live environment),
 # a list of allowed AWS account IDs should be defined:
@@ -76,9 +73,6 @@ TF_REFRESH := terraform refresh
 TF_TAINT := terraform taint -allow-missing
 TF_OUTPUT := terraform output
 
-# Git clone/pull command
-GIT_SSH_COMMAND := ssh -i /root/.ssh/git-sync-rsa.pem -o 'StrictHostKeyChecking no'
-
 # Comman separated list of cidr blocks to allow ssh; default to  $(curl -s http://ipinfo.io/ip)/32
 # TF_VAR_allow_ssh_cidr := "$(shell curl -s http://ipinfo.io/ip)/32"
 TF_VAR_timestamp := $(shell date +%Y-%m-%d-%H%M)
@@ -90,7 +84,7 @@ TF_VAR_iamuser := $(AWS_USER)
 
 export
 
-all: worker admiral
+all: worker
 
 help:
 	@echo "Usage: make plan_<resource> | <resource> | plan_destroy_<resource> | destroy_<resource>"
@@ -155,6 +149,7 @@ graph: | $(BUILD)
 
 plan:
 	@echo "plan_<resource>"
+
 show_all:
 	@$(foreach resource,$(BUILD_SUBDIRS),$(TF_SHOW) $(BUILD)/$(resource)/terraform.tfstate 2> /dev/null; )
 

@@ -79,9 +79,7 @@ function clusterScreen() {
     echo "11. Worker"
     echo "12. Etcd"
     echo "13. Iam"
-    echo "14. Elastic loadbalancer: CI"
     echo "15. Elastic loadbalancer: GitLab (WIP)"
-    echo "16. Elastic loadbalancer: dockerhub (WIP)"
     echo "17. EFS"
     echo "18. RDS"
     echo "19. Route53"
@@ -140,19 +138,7 @@ function clusterScreen() {
             return $callAgain
             ;;
         14)
-            resourceType='elb_ci'
-            updateResource
-            hitAnyKey
-            return $callAgain
-            ;;
-        15)
-            resourceType='elb-gitlab'
-            updateResource
-            hitAnyKey
-            return $callAgain
-            ;;
-        16)
-            resourceType='elb-dockerhub'
+            resourceType='elb-ci'
             updateResource
             hitAnyKey
             return $callAgain

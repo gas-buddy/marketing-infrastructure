@@ -27,7 +27,7 @@ module "etcd" {
   data_volume_type = "gp2"
   data_volume_size = 100
 
-  user_data = "${file("../cloud-config/s3-cloudconfig-bootstrap.sh")}"
+  user_data = "${data.template_file.etcd_cloud_config.rendered}"
   iam_role_policy = "${data.template_file.etcd_policy_json.rendered}"
 }
 
@@ -49,8 +49,6 @@ data "template_file" "etcd_cloud_config" {
         "AWS_SECRET_ACCESS_KEY" = "${var.deployment_key_secret}"
         "AWS_DEFAULT_REGION" = "${var.aws_account["default_region"]}"
         "CLUSTER_NAME" = "${var.cluster_name}"
-        "APP_REPOSITORY" = "${var.app_repository}"
-        "GIT_SSH_COMMAND" = "\"${var.git_ssh_command}\""
     }
 }
 

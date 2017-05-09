@@ -192,7 +192,6 @@ can be override in resources/terraform/<resource>/<resource>.tf` files.
 ```
 AWS_PROFILE ?= coreos-cluster
 CLUSTER_NAME ?= coreos-cluster
-APP_REPOSITORY ?= https://github.com/dockerage/coreos-cluster-apps
 COREOS_UPDATE_CHANNEL ?= beta
 AWS_REGION ?= us-west-2
 VM_TYPE ?= hvm
@@ -380,7 +379,6 @@ $ make destroy_<resource>
 │   ├── cloud-config
 │   │   ├── admiral.yaml.tmpl
 │   │   ├── common-files.yaml.tmpl
-│   │   ├── dockerhub.yaml
 │   │   ├── etcd.yaml.tmpl
 │   │   ├── files-vault.yaml
 │   │   ├── files.yaml
@@ -407,7 +405,6 @@ $ make destroy_<resource>
 │   │   ├── admiral_policy.json
 │   │   ├── assume_role_policy.json
 │   │   ├── deployment_policy.json
-│   │   ├── dockerhub_policy.json
 │   │   ├── etcd_policy.json
 │   │   ├── vault_policy.json
 │   │   └── worker_policy.json
@@ -420,8 +417,6 @@ $ make destroy_<resource>
 │       │   └── efs.tf
 │       ├── elb-ci
 │       │   └── ci.tf
-│       ├── elb-dockerhub
-│       │   └── dockerhub.tf
 │       ├── etcd
 │       │   └── etcd.tf
 │       ├── iam
