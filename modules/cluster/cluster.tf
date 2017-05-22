@@ -1,20 +1,33 @@
 #
 #  General cluster autoscale group configurations
 #
+
+variable "asg_health_check_type" {
+  type = "string"
+  default = "EC2"
+}
+
+variable "asg_load_balancers" {
+  type = "list"
+  default = []
+}
+
 resource "aws_autoscaling_group" "instance_pool" {
   vpc_zone_identifier = ["${split(",",var.cluster_vpc_zone_identifiers)}"]
   name = "${var.cluster_name}-${var.asg_name}"
   min_size = "${var.cluster_min_size}"
   max_size = "${var.cluster_max_size}"
   desired_capacity = "${var.cluster_desired_capacity}"
-  
-  health_check_type = "EC2"
+
+  load_balancers = ["${var.asg_load_balancers}"]
+
+  health_check_type = "${var.asg_health_check_type}"
   health_check_grace_period = 300
   force_delete = true
   metrics_granularity = "1Minute"
 
   launch_configuration = "${aws_launch_configuration.instance_pool.name}"
-  
+
   tag {
     key = "Name"
     value = "${var.cluster_name}-${var.asg_name}"
@@ -28,8 +41,8 @@ resource "aws_launch_configuration" "instance_pool" {
   image_id = "${var.ami}"
   instance_type = "${var.image_type}"
   iam_instance_profile = "${aws_iam_instance_profile.instance_pool.name}"
-  security_groups = ["${split(",",var.cluster_security_groups)}"]
-  key_name = "${var.keypair}"  
+  security_groups = ["${var.cluster_security_groups}"]
+  key_name = "${var.keypair}"
   lifecycle { create_before_destroy = true }
 
   # /root

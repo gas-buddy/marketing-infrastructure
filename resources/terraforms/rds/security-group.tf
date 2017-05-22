@@ -7,7 +7,7 @@ resource "aws_db_subnet_group" "cluster_db" {
 resource "aws_security_group" "rds"  {
     name = "rds"
     vpc_id = "${var.cluster_vpc_id}"
-    description = "rds SG"
+    description = "rds"
 
     # Allow all outbound traffic
     egress {
@@ -22,13 +22,10 @@ resource "aws_security_group" "rds"  {
       from_port = 3306
       to_port = 3306
       protocol = "tcp"
-      cidr_blocks = ["${var.cluster_vpc_cidr}", "${split(",", var.allow_ssh_cidr)}"]
+      security_groups = ["${var.cluster_default_security_group}"]
     }
-    # Allow PostgresSQL access
-    ingress {
-      from_port = 5432
-      to_port = 5432
-      protocol = "tcp" 
-      cidr_blocks = ["${var.cluster_vpc_cidr}", "${split(",", var.allow_ssh_cidr)}"]
+
+    tags {
+        Name = "${var.cluster_name}-rds"
     }
 }

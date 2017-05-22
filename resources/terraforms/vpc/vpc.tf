@@ -43,5 +43,25 @@ resource "aws_vpc_endpoint" "s3" {
     route_table_ids = ["${aws_route_table.cluster_vpc.id}"]
 }
 
+resource "aws_default_security_group" "default" {
+  vpc_id = "${aws_vpc.cluster_vpc.id}"
+
+  ingress {
+    protocol  = -1
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 output "cluster_vpc_id" { value = "${aws_vpc.cluster_vpc.id}" }
 output "cluster_vpc_cidr" { value = "${aws_vpc.cluster_vpc.cidr_block}" }
+output "cluster_availaiblity_zones" { value = "${aws_availability_zones}" }
+output "cluster_default_security_group" { value = "${aws_default_security_group.default.id}" }

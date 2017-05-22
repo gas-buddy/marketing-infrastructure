@@ -8,27 +8,6 @@ coreos:
   update:
     reboot-strategy: etcd-lock
   units:
-    - name: mnt-efs.mount
-      content: |
-        [Mount]
-        What=${AWS_EFS_ID}.efs.${AWS_DEFAULT_REGION}.amazonaws.com:/
-        Where=/mnt/efs
-        Type=nfs
-    - name: efs-az.service
-      command: start
-      content: |
-        [Unit]
-        Description=mount EFS in this AZ
-        [Service]
-        Type=oneshot
-        ExecStart=/bin/sh -c "AZ_ZONE=$(curl -L http://169.254.169.254/latest/meta-data/placement/availability-zone); sed -i \"s/AZ_ZONE/$AZ_ZONE/\" /etc/systemd/system/mnt-efs.mount; systemctl daemon-reload; systemctl restart mnt-efs.mount"
-    - name: etcd2.service
-      command: start
-      drop-ins:
-        - name: 60-initial-cluster.conf
-          content: |
-            [Service]
-            EnvironmentFile=/etc/sysconfig/initial-cluster
     - name: format-disk.service
       command: start
       content: |
@@ -64,20 +43,6 @@ coreos:
             [Service]
             Restart=always
             RestartSec=5
-    - name: nginx-php.service
-      command: start
-      content: |
-        [Unit]
-        Description=NGINX configured for Wordpress
-        Requires=network-online.target
-        After=network-online.target
-        [Service]
-        Slice=machine.slice
-        ExecStart=/usr/bin/rkt --insecure-options=image --port=80-tcp:9090 --volume data,kind=host,source=/mnt/efs/blog,readOnly=false --mount volume=data,target=/var/www/html run docker://gasbuddy/nginx-php-fpm-efs
-        KillMode=mixed
-        Restart=always
-        [Install]
-        WantedBy=multi-user.target
     - name: wodby-wordpress-varnish.service
       command: start
       content: |
@@ -87,7 +52,7 @@ coreos:
         After=network-online.target
         [Service]
         Slice=machine.slice
-        ExecStart=/usr/bin/rkt --insecure-options=image --port=6081-tcp:8080 --port=6082-tcp:8081 --set-env=VARNISH_BACKEND_HOST=127.0.0.1 --set-env=VARNISH_BACKEND_PORT=9090 run docker://wodby/wordpress-varnish
+        ExecStart=/usr/bin/rkt --insecure-options=image --port=6081-tcp:8080 --port=6082-tcp:8081 --set-env=VARNISH_BACKEND_HOST=${ELB_WEB_DNS_NAME} --set-env=VARNISH_BACKEND_PORT=8080 run docker://wodby/wordpress-varnish
         KillMode=mixed
         Restart=always
         [Install]

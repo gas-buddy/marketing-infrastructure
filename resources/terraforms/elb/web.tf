@@ -1,16 +1,19 @@
 #
-# ELB for CI
+# ELB for Web
 #
 
-variable "ci_cert" { default = "../certs/site.pem" }
-variable "ci_cert_chain" { default = "../certs/rootCA.pem" }
-variable "ci_cert_key" { default = "../certs/site-key.pem" }
+variable "web_cert" { default = "../certs/site.pem" }
+variable "web_cert_chain" { default = "../certs/rootCA.pem" }
+variable "web_cert_key" { default = "../certs/site-key.pem" }
 
-resource "aws_elb" "ci" {
-  name = "${var.cluster_name}-elb-ci"
-  depends_on = [ "aws_iam_server_certificate.wildcard" ]  
+resource "aws_elb" "web" {
+  name = "${var.cluster_name}-elb-web"
+  depends_on = [ "aws_iam_server_certificate.wildcard" ]
   subnets = ["${var.elb_subnet_0_id}","${var.elb_subnet_1_id}","${var.elb_subnet_2_id}"]
-  security_groups = [ "${aws_security_group.elb_ci.id}" ]
+  security_groups = [ "${aws_security_group.elb_web.id}" ]
+
+  cross_zone_load_balancing   = true
+  idle_timeout                = 400
 
   listener {
     lb_port = 443
@@ -36,16 +39,16 @@ resource "aws_elb" "ci" {
   }
 
   tags {
-      Name = "${var.cluster_name}-elb-ci"
+      Name = "${var.cluster_name}-elb-web"
   }
 }
 
 # Upload a example/demo wildcard cert
 resource "aws_iam_server_certificate" "wildcard" {
   name = "${var.app_domain}"
-  certificate_body = "${file("${var.ci_cert}")}"
-  certificate_chain = "${file("${var.ci_cert_chain}")}"
-  private_key = "${file("${var.ci_cert_key}")}"
+  certificate_body = "${file("${var.web_cert}")}"
+  certificate_chain = "${file("${var.web_cert_chain}")}"
+  private_key = "${file("${var.web_cert_key}")}"
 
   lifecycle {
     create_before_destroy = true
@@ -60,10 +63,10 @@ EOF
   }
 }
 
-resource "aws_security_group" "elb_ci"  {
-    name = "${var.cluster_name}-elb-ci"
+resource "aws_security_group" "elb_web"  {
+    name = "${var.cluster_name}-elb-web"
     vpc_id = "${var.cluster_vpc_id}"
-    description = "${var.cluster_name} elb-ci"
+    description = "${var.cluster_name} elb-web"
 
     # Allow all outbound traffic
     egress {
@@ -88,37 +91,10 @@ resource "aws_security_group" "elb_ci"  {
     }
 
     tags {
-      Name = "${var.cluster_name}-elb-ci"
+      Name = "${var.cluster_name}-elb-web"
     }
 }
 
-# DNS registration
-resource "aws_route53_record" "private-ci" {
-  zone_id = "${var.route53_private_zone_id}"
-  name = "ci"
-  type = "A"
-  
-  alias {
-    name = "${aws_elb.ci.dns_name}"
-    zone_id = "${aws_elb.ci.zone_id}"
-    evaluate_target_health = true
-  }
-}
-resource "aws_route53_record" "public-ci" {
-  zone_id = "${var.route53_public_zone_id}"
-  name = "ci"
-  type = "A"
-  
-  alias {
-    name = "${aws_elb.ci.dns_name}"
-    zone_id = "${aws_elb.ci.zone_id}"
-    evaluate_target_health = true
-  }
-}
-
-output "security_group_elb" {
-    value = "${aws_security_group.elb_ci.id}"
-}
-output "elb_name" {
-    value = "${aws_elb.ci.id}"
-}
+output "elb_web_security_group" { value = "${aws_security_group.elb_web.id}" }
+output "elb_web_name" { value = "${aws_elb.web.name}" }
+output "elb_web_dns_name" { value = "${aws_elb.web.dns_name}" }

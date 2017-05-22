@@ -15,7 +15,7 @@ worker_only: init create_worker_key
 plan_worker: init_worker
 	cd $(BUILD)/worker; $(TF_GET); $(TF_PLAN)
 
-init_worker: efs etcd create_worker_key
+init_worker: efs elb etcd create_worker_key
 	mkdir -p $(BUILD)/worker
 	cp -rf $(RESOURCES)/terraforms/worker/worker.tf $(BUILD)/worker
 	cd $(BUILD)/worker ; ln -sf ../*.tf .

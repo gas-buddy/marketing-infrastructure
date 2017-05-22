@@ -10,7 +10,7 @@ module "etcd" {
   cluster_min_size = 1
   cluster_max_size = 1
   cluster_desired_capacity = 1
-  cluster_security_groups = "${aws_security_group.etcd.id}"
+  cluster_security_groups = ["${var.cluster_default_security_group}", "${aws_security_group.etcd.id}"]
 
   # Instance specifications
   ami = "${var.ami}"
@@ -76,22 +76,6 @@ resource "aws_security_group" "etcd"  {
     to_port = 0
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow etcd peers to communicate, include etcd proxies
-  ingress {
-    from_port = 2380
-    to_port = 2380
-    protocol = "tcp"
-    cidr_blocks = ["${var.cluster_vpc_cidr}"]
-  }
-
-  # Allow etcd clients to communicate
-  ingress {
-    from_port = 2379
-    to_port = 2379
-    protocol = "tcp"
-    cidr_blocks = ["${var.cluster_vpc_cidr}"]
   }
 
   # Allow SSH from my hosts
