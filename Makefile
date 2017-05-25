@@ -86,6 +86,10 @@ export
 
 all: worker
 
+init_env:
+	mkdir -p $(BUILD)
+	cp -rf $(RESOURCES)/terraforms/environments/$(ENV).tf $(BUILD)/
+
 help:
 	@echo "Usage: make plan_<resource> | <resource> | plan_destroy_<resource> | destroy_<resource>"
 	@echo "Or make show_<resource> | graph"
