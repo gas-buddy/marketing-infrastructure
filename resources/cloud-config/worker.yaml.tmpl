@@ -73,7 +73,7 @@ coreos:
         After=network-online.target
         [Service]
         Slice=machine.slice
-        ExecStart=/usr/bin/rkt --insecure-options=image --port=80-tcp:9090 --volume data,kind=host,source=/mnt/efs/blog,readOnly=false --mount volume=data,target=/var/www/html run docker://gasbuddy/nginx-php-fpm-efs
+        ExecStart=/usr/bin/rkt --insecure-options=image --port=80-tcp:9090 --volume data,kind=host,source=/mnt/efs/blog,readOnly=false --mount volume=data,target=/var/www/html --dns=host run docker://gasbuddy/nginx-php-fpm-efs
         KillMode=mixed
         Restart=always
         [Install]
