@@ -87,7 +87,7 @@ coreos:
         After=network-online.target
         [Service]
         Slice=machine.slice
-        ExecStart=/usr/bin/rkt --insecure-options=image --port=6081-tcp:8080 --port=6082-tcp:8081 --set-env=VARNISH_BACKEND_HOST=127.0.0.1 --set-env=VARNISH_BACKEND_PORT=9090 run docker://wodby/wordpress-varnish
+        ExecStart=/usr/bin/rkt --insecure-options=image --port=6081-tcp:8080 --port=6082-tcp:8081 --set-env=VARNISH_BACKEND_HOST=172.16.28.1 --set-env=VARNISH_BACKEND_PORT=9090 run docker://wodby/wordpress-varnish
         KillMode=mixed
         Restart=always
         [Install]

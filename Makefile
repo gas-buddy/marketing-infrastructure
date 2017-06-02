@@ -155,7 +155,10 @@ plan:
 	@echo "plan_<resource>"
 
 show_all:
+	@echo $(BUILD_SUBDIRS)
 	@$(foreach resource,$(BUILD_SUBDIRS),$(TF_SHOW) $(BUILD)/$(resource)/terraform.tfstate 2> /dev/null; )
+
+
 
 # TODO: Push/Pull terraform states from a tf state repo
 # For team work, you need to commit terraform to a remote location, such as git repo, S3 
